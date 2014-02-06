@@ -5,18 +5,9 @@
 #include <algorithm>
 #include <iostream>
 
+// let's be real about the best way to compute factorial.
+// todo: fill in the remaining values...
 const long long int FACT[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800};
-
-template<typename iter>
-void print_range(iter a, iter b) {
-    std::cout << "printing range " << *a << " " << *b << std::endl;
-    while (a != b) {
-        std::cout << *a << std::endl;
-        ++a;
-    }
-    std::cout << "done printing range" << std::endl;
-}
-
 
 // algorithm informed by knuth, vol4.
 // finds the next permutation in [start,end)
@@ -118,11 +109,7 @@ bool next_match_second(const iter start, const iter end) {
         std::sort(stack,end);
         auto old_y = stack-1;
         auto new_y = std::upper_bound(stack, end, *old_y);
-//        std::cout << "Stack: " << *stack << std::endl;
-//        std::cout << "Old y: " << *old_y << std::endl;
-//        std::cout << "New y: " << *new_y << std::endl;
         if (new_y != end) {
-            //std::cout << "Ending" << std::endl;
             // why does this maintain the sorted-ness of [stack,end)?
             // Because new_y points to the first element larger than old_y.
             // so when we swap them, we still maintain sorted order.
@@ -228,20 +215,10 @@ bool next_comb(iter start, iter end) {
 }
 
 
-template<class iter>
-unsigned length(iter begin, iter end) {
-    unsigned l = 0;
-    while(begin != end) {
-        ++l;
-        ++begin;
-    }
-    return l;
-}
-
 // this is supposedly faster, but is it?
 template<class iter>
 bool next_comb_static(iter start, iter end) {
-    static const int l = length(start,end-2);
+    static const int l = distance(start,end-2);
     static const int n = *(end-2);
     static int j = l;
     // we're descending and incrementing:
@@ -277,45 +254,6 @@ bool next_comb_static(iter start, iter end) {
             return false;
         }
     }
-}
-
-//
-//
-/// SCRAP
-int retrieve(unsigned index, std::vector<int>& s) {
-    unsigned counter = 0;
-    int to_ret=-1;
-    for (auto it = s.begin(); it != s.end(); ++it) {
-        if (counter == index) {
-            to_ret = *it;
-        }
-        if (counter >= index) {
-            if (it+1 != s.end()) {
-                *it = *(it+1);
-            }
-        }
-        ++counter;
-    }
-    return to_ret;
-}
-
-template<typename I, typename S>
-void int_to_perm(int k, unsigned l, I a, S collection) {
-    for (unsigned i = 0; i < l; ++i) {
-        // we want the floor function here
-        unsigned index = k/FACT[l-(i+1)];
-        *a = retrieve(index,collection);
-        ++a;
-        k -= FACT[l-(i+1)]*index;
-    }
-}
-
-// the goal of this function is the following:
-// interpretting the sequence [begin, end) as the
-// ith lexicographical permutation, transform it
-// into the i+kth lexicographical permutation.
-template<typename iter>
-void int_to_perm(int k, iter begin, iter end) {
 }
 
 #endif

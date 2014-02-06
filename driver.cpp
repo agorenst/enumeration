@@ -1,6 +1,8 @@
 #include "enumeration.h"
 
 using namespace std;
+
+// debugging: let's print a vector of elements
 template<typename t>
 ostream& operator<<(ostream& o, vector<t> a) {
     for (auto it = a.begin(); it != a.end(); ++it) {
@@ -10,7 +12,8 @@ ostream& operator<<(ostream& o, vector<t> a) {
 }
 
 //
-// Lots of testing stuff here.
+// These first two functions test the correctness of my
+// permutation implementation, from Knuth
 //
 void test_perm_correctness_simple(unsigned int n) {
     vector<int> a(n);
@@ -27,6 +30,7 @@ void test_perm_correctness_simple(unsigned int n) {
         my_imp = next_perm(a.begin(), a.end());
     } while(built_in && my_imp);
     cout << "Do they both end at the same time?" << "\t" << (built_in == my_imp) << endl;
+    cout << "Are they in the equal state at the end? " << (a == b) << endl;
 }
 
 void test_perm_correctness(vector<int> tester) {
@@ -44,45 +48,31 @@ void test_perm_correctness(vector<int> tester) {
     cout << "Are they in the equal state at the end? " << (a == b) << endl;
 }
 
-
-void test_correctness(unsigned n) {
-    vector<int> a(n);
-    for (unsigned i = 0; i < n; ++i) {
-        a[i] = i;
-    }
-    auto b = a;
-    do {
-        if (a != b) {
-            cout << "Error! " << a << "\t" << b << endl;
-        }
-        next_permutation(b.begin(), b.end());
-    } while (next_perm(a.begin(), a.end()));
-}
-
-unsigned compute_mine(unsigned n) {
+//
+// this is a timing experiment for the permutations.
+//
+unsigned time_permutation(unsigned n, bool mine = true) {
     vector<int> a(n);
     for (unsigned i = 0; i < n; ++i) {
         a[i] = i;
     }
     unsigned x = 0;
-    do {
-        ++x;
-    } while(next_perm(a.begin(), a.end()));
+    if (mine) {
+        do {
+            ++x;
+        } while(next_perm(a.begin(), a.end()));
+    }
+    else {
+        do {
+            ++x;
+        } while(next_permutation(a.begin(), a.end()));
+    }
     return x;
 }
 
-// times the built-in "next_permutation" method.
-unsigned compute_system(unsigned n) {
-    vector<int> a(n);
-    for (unsigned i = 0; i < n; ++i) {
-        a[i] = i;
-    }
-    unsigned x = 0;
-    do {
-        ++x;
-    } while(next_permutation(a.begin(), a.end()));
-    return x;
-}
+//==========================
+// Testing the matching permutation
+//==========================
 
 void test_match() {
     vector<int> a = {1,2,3,4,5,6};
@@ -145,10 +135,11 @@ void match_to_parens() {
     } while(next_match(a.begin(), a.end()));
 }
 
+//=========================
+// Testing the combination code
+//=========================
+
 void test_comb(int n, int s) {
-//    if (s > n/2) {
-//        s = n-s;
-//    }
     vector<int> a(s+2);
     for (int i = 0; i < s; ++i) {
         a[i] = i-0;
@@ -158,57 +149,26 @@ void test_comb(int n, int s) {
     //cout << a << endl;
     unsigned x = 0;
     do {
-        //cout << a << endl;
-//        for (auto it = a.rbegin()+2; it != a.rend()+1; ++it) {
-//            cout << *it << " ";
-//        }
-//        cout << endl;
         ++x;
-    //} while(next_comb_first(a.begin(), a.end()));
     } while(next_comb(a.begin(), a.end()));
     cout << "Total: " << x << endl;
 }
 
+void print_comb(int n, int k) {
+    vector<int> a(k+2);
+    for (int i = 0; i < k; ++ i) {
+        a[i] = i -0;
+    }
+    a[k+0] = n;
+    a[k+1] = 0;
+    do {
+        for (auto it = a.begin(); it != a.end()-2; ++it) {
+            cout << *it << " ";
+        }
+        cout << endl;
+    } while(next_comb(a.begin(), a.end()));
+}
+
 int main(int argc, char* argv[]) {
-    test_comb(atoi(argv[1]), atoi(argv[2]));
-//    match_to_parens();
-    //test_match();
-      //time_matching(atoi(argv[1]), atoi(argv[2]));
-      //test_new_match_correctness(atoi(argv[1]));
-//      time_old_match(atoi(argv[1]));
-      //time_new_match(atoi(argv[1]));
-//    test_perm_correctness_simple(5);
-//    test_perm_correctness({1,2,3,3,3,4});
-//    //cout << compute_mine(atoi(argv[1])) << endl;
-//    const int len = 3;
-//    //bool a[len] = {false, false, false, false, false};
-//    bool a[len] = {false, false, false};
-//    do {
-//        for (int i = 0; i < len; ++i) {
-//            cout << a[i] << " " ;
-//        }
-//        cout << endl;
-//    } while(next_subset(a, a+len));
-//    //cout << compute_system(atoi(argv[1])) << endl;
-//    //
-//    cout << endl;
-//    vector<int> test = {1, 2, 3, 4, 5, 6, 7};
-//    cout << retrieve(2,test) << endl;
-//    cout << test << endl;
-//    cout << retrieve(2,test) << endl;
-//    cout << test << endl;
-//    cout << retrieve(2,test) << endl;
-//    cout << test << endl;
-//    cout << retrieve(2,test) << endl;
-//    cout << test << endl;
-//    vector<int> make_me(4);
-//    vector<int> valid_perm = {1,2,3,3};
-//    vector<int> main_perm  = {1,2,3,3};
-//    std::vector<int> perm4 = {1,2,3,3};
-//    for (int i = 0; i < FACT[4]; ++i) {
-//        int_to_perm(i, 4, make_me.begin(), perm4);
-//        cout << make_me << "\t" << valid_perm << "\t" << main_perm << "\t" << (make_me == valid_perm) << "\t" << (valid_perm == main_perm) << endl;
-//        next_perm(valid_perm.begin(), valid_perm.end());
-//        next_permutation(main_perm.begin(), main_perm.end());
-//    }
+    print_comb(atoi(argv[1]), atoi(argv[2]));
 }
