@@ -1,5 +1,6 @@
 import Data.Char
 import Data.List
+import System.Environment
 import SelfReductionParser
 {-
 This is the core algorithm.
@@ -79,55 +80,76 @@ propogatingCNFSucc :: CNF -> Assignment -> [Assignment]
 propogatingCNFSucc cnf asgn =
     let cnf' = applyAssignment cnf asgn in
     if not (isTerminal cnf') then
-        let units = foldl (++) [] ((filter (\c -> length c == 1)) cnf') in
+        let units = concat (filter (\c -> length c == 1) cnf') in
         if units /= [] then [units++asgn]
         else let a = chooseVar cnf' in [a:asgn, -a:asgn]
     else []
             where chooseVar = head . head
 
 {-
+Input: a cnf with asgn *already assigned*.
+Outpt: applies any units in cnf recursively, appends them to assignment
+-}
+applyUnits :: CNF -> Assignment -> (CNF, Assignment)
+applyUnits cnf asgn =
+    let units = concat (filter (\c -> length c == 1) cnf) in
+    if units /= [] then applyUnits (applyAssignment cnf units) (units++asgn)
+    else (cnf, asgn)
+
+saveStateCNFSucc :: CNF -> (CNF, Assignment) -> [(CNF, Assignment)]
+saveStateCNFSucc origCNf (cnf, asgn) =
+    if isTerminal cnf then []
+    else
+        let a :: Int
+            a = head . head $ cnf in
+        [(applyUnits (applyVar cnf a) (a:asgn)), applyUnits (applyVar cnf (-a)) ((-a):asgn)]
+
+
+saveStateCNFExploration cnf = dfs (saveStateCNFSucc cnf) [(cnf,[])]
+-- this mess can be optimized (inner lambda -> c == []), but hey.
+enumSatCNF3 cnf = map (\(c,a) -> a) (filter (\(c,a) -> satisfies cnf a) (saveStateCNFExploration cnf))
+
+{-
 Generates a list of all leaves, filtered by those which satisfy (rather than
 unsat) the cnf.
 In other words, our solver!
 -}
-enumSatCNF cnf =
-  filter (satisfies cnf) (dfs (propogatingCNFSucc cnf) [[]])
-  --filter (satisfies cnf) (dfs (cnfSucc cnf) [[]])
 
--- actually running the code!
-cliEnumSatCNF input =
-    let cnf = stringToCNF input in -- parse the input
-    show $ length (enumSatCNF cnf) -- output the result
+cnfExploration2 cnf = dfs (propogatingCNFSucc cnf) [[]]
+enumSatCNF2 cnf = filter (satisfies cnf) (cnfExploration2 cnf)
 
-{-                          -}
-{- Hamiltonian Path Section -}
-{-                          -}
-neighborFun :: (Eq a) => [(a,a)]->a->[a]
-neighborFun edgeset v =
-    map (\(_,y)-> y ) (filter (\(a,_) -> a == v) edgeset)
+cnfExploration1 cnf = dfs (cnfSucc cnf) [[]]
+enumSatCNF1 cnf = filter (satisfies cnf) (cnfExploration1 cnf)
 
-vertices edgeset = foldl (\vs-> \(u,v)->union [u,v] vs) [] edgeset
+enumSat1' contents =
+    let cnf = stringToCNF contents in
+    show (take 10000 (cnfExploration1 cnf))
+enumSat1 = do contents <- getContents
+              putStr ((enumSat1' contents)++"\n")
 
-exampleGraph :: [(Int, Int)]
-exampleGraph = [(1,2), (2,3),(1,3),(3,2),(3,1),(1,4),(4,1)]
+cliSat1' contents =
+    let cnf = stringToCNF contents in
+    show (take 1 (enumSatCNF1 cnf))
+cliSat1 = do contents <- getContents
+             putStr ((cliSat1' contents)++"\n")
 
-{- Finding a hamiltonian path lends itself to our formulation very well.
- - The successor function is very straightforward: -}
-hampathSucc :: (Eq a) => (a->[a]) -> [a] -> [[a]]
-hampathSucc neighbors (v:vs) = 
-    {- (v:vs) is our current path. From that, we create a set of paths,
-    extended by vertices which are both
-    a) neighbors of v, and b) not already in the path -}
-    let ns = neighbors v \\ (v:vs) in
-    map (:(v:vs)) ns
+cliSat2' contents =
+    let cnf = stringToCNF contents in
+    show (take 1 (enumSatCNF2 cnf))
+cliSat2 = do contents <- getContents
+             putStr ((cliSat2' contents)++"\n")
 
-enumHamPaths g =
-    let vs = vertices  g
-        k = length vs
-        nfunc = neighborFun g
-        succ = hampathSucc nfunc
-    in filter (\l -> length l == k) (dfs succ (map (:[]) vs))
+cliSat3' contents =
+    let cnf = stringToCNF contents in
+    show (take 1 (enumSatCNF3 cnf))
+cliSat3 = do contents <- getContents
+             putStr ((cliSat3' contents)++"\n")
 
-main = do contents <- getContents
-          putStr ((cliEnumSatCNF contents)++"\n")
---main = print $ enumHamPaths exampleGraph
+main = cliSat1
+
+--main = do contents <- getContents
+--          putStr ((cliEnumSatCNF contents)++"\n")
+
+--main = do contents <- getContents
+--          putStr ((cliTakeSomeSAT contents)++"\n")
+
