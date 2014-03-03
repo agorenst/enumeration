@@ -95,7 +95,7 @@ void test_new_match_correctness(int n) {
     } while(next_match_first(b.begin(), b.end()));
 }
 
-void time_matching(int n, int version) {
+void time_matching(int n, int version = 3) {
     vector<int> a(n);
     for (auto i = 0; i < n; ++i) {
         a[i] = i;
@@ -170,5 +170,6 @@ void print_comb(int n, int k) {
 }
 
 int main(int argc, char* argv[]) {
-    print_comb(atoi(argv[1]), atoi(argv[2]));
+    //print_comb(atoi(argv[1]), atoi(argv[2]));
+    time_matching(atoi(argv[1]));
 }
