@@ -123,7 +123,7 @@ enumSatCNF1 cnf = filter (satisfies cnf) (cnfExploration1 cnf)
 
 enumSat1' contents =
     let cnf = stringToCNF contents in
-    show (take 10000 (cnfExploration1 cnf))
+    show (length (cnfExploration1 cnf))
 enumSat1 = do contents <- getContents
               putStr ((enumSat1' contents)++"\n")
 
@@ -135,7 +135,7 @@ cliSat1 = do contents <- getContents
 
 cliSat2' contents =
     let cnf = stringToCNF contents in
-    show (take 1 (enumSatCNF2 cnf))
+    show (length (enumSatCNF2 cnf))
 cliSat2 = do contents <- getContents
              putStr ((cliSat2' contents)++"\n")
 
@@ -145,7 +145,13 @@ cliSat3' contents =
 cliSat3 = do contents <- getContents
              putStr ((cliSat3' contents)++"\n")
 
-main = cliSat1
+enumSat3' contents =
+    let cnf = stringToCNF contents in
+    show (length (enumSatCNF3 cnf))
+enumSat3 = do contents <- getContents
+              putStr ((enumSat3' contents)++"\n")
+
+main = enumSat1
 
 --main = do contents <- getContents
 --          putStr ((cliEnumSatCNF contents)++"\n")
