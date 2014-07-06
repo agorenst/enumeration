@@ -15,6 +15,7 @@ bool next_match(const iter start, const iter end) {
         // we "unmatch" (stack-2,stack-1). So we place
         // stack-1 (old_y) back into the sorted list.
         // This maintains the invariant that [stack,end) is sorted.
+        // This loop is really just a ``left-shift''.
         while((old_y+1) != end && *(old_y) > *(old_y+1)) {
             std::swap(*old_y,*(old_y+1));
             ++old_y;
@@ -31,6 +32,7 @@ bool next_match(const iter start, const iter end) {
             std::swap(*new_y,*(stack-1));
 
             // but then we need to restore the sorted-ness invariant.
+            // This loop is really just a single iteration of selection sort.
             while((new_y-1) >= stack && *(new_y) < *(new_y-1)) {
                 std::swap(*new_y,*(new_y-1));
                 --new_y;
