@@ -15,8 +15,8 @@ int fact[] = {
     720 // etc...
 };
 
-void printer(int* a) {
-    for_each(a,a+4,[](int x) { cout << x << " "; }); cout << endl;
+void printer(int* a, int n = 4) {
+    for_each(a,a+n,[](int x) { cout << x << " "; }); cout << endl;
 }
 void printer(std::vector<int>& a) {
     for_each(a.begin(),a.end(),[](int x) { cout << x << " "; }); cout << endl;
@@ -50,16 +50,40 @@ std::vector<int> i_to_perm(const int N, int i) {
     return p;
 }
 
-int main() {
-    int a[] = {0,1,2,3};
+int* make_array(int n) {
+    int* a = new int[n];
+    for (int i = 0; i < n; ++i) {
+        a[i] = i;
+    }
+    return a;
+}
+
+bool test(int n) {
+    int* a = make_array(n);
     int i = 0;
     do {
-        printer(a);
-        auto b = i_to_perm(4,i);
-        printer(b);
-        for (int j = 0; j < 4; ++j) {
-            assert(b[j] == a[j]);
+        auto b = i_to_perm(n,i);
+        for (int j = 0; j < n; ++j) {
+            if (b[j] != a[j]) { return false; }
+            //assert(b[j] == a[j]);
         }
+        // verbose, to check that it really does produce the output we expect.
+        //printer(a,n);
+        //printer(b);
         ++i;
-    } while(next_permutation(a, a+4));
+    } while(next_permutation(a, a+n));
+    delete [] a;
+    return true;
+}
+
+
+int main() {
+    assert(test(0)); // I' mpretty sure nothing even runs here?
+    assert(test(1));
+    assert(test(2));
+    assert(test(3));
+    assert(test(4));
+    assert(test(5));
+    assert(test(6));
+    assert(test(7));
 }
