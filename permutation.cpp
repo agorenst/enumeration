@@ -3,60 +3,54 @@
 #include <iostream>
 #include <cassert>
 
-using namespace std;
-void printer(int* a) {
-    for_each(a,a+4,[](int x) { cout << x << " "; }); cout << endl;
-}
-
+// Developed without any explicit reference, though I've done similar things
+// before. I think Knuth has a nice collection of these. We trust that the input
+// is already sorted and each element unique. The algorithm can be improved
+// (we don't need sort, and in practice the while-loop can be a lookup table)
+// and more robust, but it's a perfectly fine starting point, and a neat
+// example of exploring self-reducible algorithms.
 template<class IT>
 void i_to_perm(IT most_significant, IT after_least_significant, int i) {
-    //cout << "Original input: " << i << endl;
-
-    // the 0-th permutation is no change at all. So too is the n!-th permutation.
-    // The idea is that i must fit between some (n-1)! <= i < n!.
-    // So i = (n-1)!*k + j, where j < (n-1)!
-    // We observe that for the permutations starting at (n-1)! to n!-1, the
-    // nth-least-significant digit is what's being swapped.
-    // In particular, we swap it with the kth value.
-    // we then sort the suffix
     while (i > 0) {
-        //cout << "\ti         " << i << endl;
         int n = 1;
         int nfact = 1;
 
-        // we want to apply the "largest" possible permutation
-        // of one element. So, we find the largest factorial
-        // that fits in our range. I.e., if i is between
-        // (n-1)! and n!, then we're going to swap the (n-1)-st
-        // element.
         while (nfact <= i) {
             ++n;
             nfact *= n;
         }
-        //cout << "\tn         " << n << endl;
-        //cout << "\tnfact     " << nfact << endl;
-        // now we have i <= nfact
-        auto k = i / (nfact/n); // integer division, truncates.
-        //cout << "\tk         " << k << endl;
-        assert(k <= (n-1)); // is that right? remember we're counting "backwards"...
-        
+        auto k = i / (nfact/n);
+
         auto swapper1 = after_least_significant-n;
-        //auto swapper2 = after_least_significant-k;
         auto swapper2 = swapper1+k;
-        // check about stuff
 
         std::swap(*swapper1,*swapper2);
-        //cout << "before sort" << endl;
-        //printer(most_significant);
+        // overkill
         std::sort(swapper1+1,after_least_significant);
-        //cout << "after sort" << endl;
-        //printer(most_significant);
 
         i -= (k*(nfact/n));
-        //cout << "new i " << i << endl;
     }
 }
+bool test_execution() {
+    int a[] = {0,1,2,3};
+    int b[] = {0,1,2,3};
+    i_to_perm(a,a+4,4);
+    // we expect a = {1 4 2 3}
+    for(int i = 0; i < 4; ++i) {
+        next_permutation(b,b+4);
+    }
+    for (int i = 0; i < 4; ++i) {
+        if (a[i] != b[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 
+using namespace std;
+void printer(int* a) {
+    for_each(a,a+4,[](int x) { cout << x << " "; }); cout << endl;
+}
 
 int main() {
     int a[] = {1,2,3,4};
@@ -73,4 +67,5 @@ int main() {
         printer(a);
         //printer(a);
     }
+    cout << test_execution() << endl;
 }
