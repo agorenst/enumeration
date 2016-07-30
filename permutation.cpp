@@ -2,6 +2,25 @@
 #include <iterator>
 #include <iostream>
 #include <cassert>
+#include <vector>
+
+using namespace std;
+int fact[] = {
+    1,
+    1,
+    2,
+    6,
+    24,
+    120,
+    720 // etc...
+};
+
+void printer(int* a) {
+    for_each(a,a+4,[](int x) { cout << x << " "; }); cout << endl;
+}
+void printer(std::vector<int>& a) {
+    for_each(a.begin(),a.end(),[](int x) { cout << x << " "; }); cout << endl;
+}
 
 // Developed without any explicit reference, though I've done similar things
 // before. I think Knuth has a nice collection of these. We trust that the input
@@ -9,63 +28,38 @@
 // (we don't need sort, and in practice the while-loop can be a lookup table)
 // and more robust, but it's a perfectly fine starting point, and a neat
 // example of exploring self-reducible algorithms.
-template<class IT>
-void i_to_perm(IT most_significant, IT after_least_significant, int i) {
-    while (i > 0) {
-        int n = 1;
-        int nfact = 1;
+std::vector<int> i_to_perm(const int N, int i) {
+    std::vector<int> p(N);
 
-        while (nfact <= i) {
-            ++n;
-            nfact *= n;
-        }
-        auto k = i / (nfact/n);
+    for (int k = 0; k < N; ++k) { p[k] = k; }
 
-        auto swapper1 = after_least_significant-n;
-        auto swapper2 = swapper1+k;
+    for (int n = N-1; n > 0; --n) {
 
-        std::swap(*swapper1,*swapper2);
-        // overkill
-        std::sort(swapper1+1,after_least_significant);
+        int j = i / fact[n]; // which is the j-th chunk of size fact[n] our input fits in?
+        int w = (N-1)-n; // we need to swap the element we're "writing", and reverse our index.
+        int s = w+j; // the s-th largest element in [w,end)
 
-        i -= (k*(nfact/n));
+        //if (j == 0) { continue; } // mathematically this isn't needed. Optimization!
+        std::swap(p[w],p[s]);
+
+        // we can do better, knowing that there's exactly 1 out-
+        // of-place element. But for now...
+        std::sort(p.begin()+w+1,p.end());
+        i -= j*fact[n];
     }
-}
-bool test_execution() {
-    int a[] = {0,1,2,3};
-    int b[] = {0,1,2,3};
-    i_to_perm(a,a+4,4);
-    // we expect a = {1 4 2 3}
-    for(int i = 0; i < 4; ++i) {
-        next_permutation(b,b+4);
-    }
-    for (int i = 0; i < 4; ++i) {
-        if (a[i] != b[i]) {
-            return false;
-        }
-    }
-    return true;
-}
-
-using namespace std;
-void printer(int* a) {
-    for_each(a,a+4,[](int x) { cout << x << " "; }); cout << endl;
+    return p;
 }
 
 int main() {
-    int a[] = {1,2,3,4};
+    int a[] = {0,1,2,3};
+    int i = 0;
     do {
         printer(a);
+        auto b = i_to_perm(4,i);
+        printer(b);
+        for (int j = 0; j < 4; ++j) {
+            assert(b[j] == a[j]);
+        }
+        ++i;
     } while(next_permutation(a, a+4));
-    sort(a,a+4);
-    //printer(a);
-    cout << endl;
-    for (int i = 0; i < 24; ++i) {
-        sort(a,a+4);
-        //printer(a);
-        i_to_perm(a,a+4,i);
-        printer(a);
-        //printer(a);
-    }
-    cout << test_execution() << endl;
 }
