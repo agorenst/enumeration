@@ -76,9 +76,58 @@ bool test(int n) {
     return true;
 }
 
+// let's be real about the best way to compute factorial.
+// todo: fill in the remaining values...
+const long long int FACT[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800};
+
+// algorithm informed by knuth, vol4.
+// finds the next permutation in [start,end)
+// Curiously, seems to be faster than the built-
+// in version of this function. Why?
+template<typename iter>
+bool next_perm(const iter start, const iter end) {
+    if (start == end || start + 1 == end) {
+        return false; // trivial permutation.
+    }
+    auto j = end;
+    --j; // point to the last *valid* element
+
+
+    // we set j to point to the first element that's ``in order''
+    // of course j must first point to the n-2nd element
+    // it *is* valid that j could be start.
+    do {
+        --j;
+        if (j < start) {
+            // we sort so that after the  do {...}while(next_perm)
+            // runs, the state is in sorted order after the loop.
+            std::sort(start, end);
+            return false;
+        }
+    } while(*j >= *(j+1));
+
+    // note that if we get to this point, *j < *(j+1), but also j >= start.
+    auto l = end;
+
+    // find the first element we can swap with j;
+    // we assume that \exists an element in [j, end) larger than j
+    // Observe that *(j+1) > *j, so we will succeed.
+    do {
+        --l;
+    } while (*j >= *l);
+
+    std::swap(*j,*l);
+
+    // with the swap done, we sort the remaining elements.
+    std::reverse(j+1,end);
+    return true;
+}
+
+
+
 
 int main() {
-    assert(test(0)); // I' mpretty sure nothing even runs here?
+    assert(test(0));
     assert(test(1));
     assert(test(2));
     assert(test(3));
