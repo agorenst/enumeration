@@ -1,5 +1,7 @@
 #include <algorithm>
 
+// are all the elements in sorted order?
+// This seems very over-specified...
 template<class iter>
 bool first_perm(const iter start, const iter end) {
     for (int i = 0; start+i != end; ++i) {

@@ -15,13 +15,6 @@ int fact[] = {
     720 // etc...
 };
 
-void printer(int* a, int n = 4) {
-    for_each(a,a+n,[](int x) { cout << x << " "; }); cout << endl;
-}
-void printer(std::vector<int>& a) {
-    for_each(a.begin(),a.end(),[](int x) { cout << x << " "; }); cout << endl;
-}
-
 // Developed without any explicit reference, though I've done similar things
 // before. I think Knuth has a nice collection of these. We trust that the input
 // is already sorted and each element unique. The algorithm can be improved
@@ -49,36 +42,6 @@ std::vector<int> i_to_perm(const int N, int i) {
     }
     return p;
 }
-
-int* make_array(int n) {
-    int* a = new int[n];
-    for (int i = 0; i < n; ++i) {
-        a[i] = i;
-    }
-    return a;
-}
-
-bool test(int n) {
-    int* a = make_array(n);
-    int i = 0;
-    do {
-        auto b = i_to_perm(n,i);
-        for (int j = 0; j < n; ++j) {
-            if (b[j] != a[j]) { return false; }
-            //assert(b[j] == a[j]);
-        }
-        // verbose, to check that it really does produce the output we expect.
-        //printer(a,n);
-        //printer(b);
-        ++i;
-    } while(next_permutation(a, a+n));
-    delete [] a;
-    return true;
-}
-
-// let's be real about the best way to compute factorial.
-// todo: fill in the remaining values...
-const long long int FACT[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800};
 
 // algorithm informed by knuth, vol4.
 // finds the next permutation in [start,end)
@@ -121,18 +84,4 @@ bool next_perm(const iter start, const iter end) {
     // with the swap done, we sort the remaining elements.
     std::reverse(j+1,end);
     return true;
-}
-
-
-
-
-int main() {
-    assert(test(0));
-    assert(test(1));
-    assert(test(2));
-    assert(test(3));
-    assert(test(4));
-    assert(test(5));
-    assert(test(6));
-    assert(test(7));
 }
