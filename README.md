@@ -21,9 +21,9 @@ Things are still a bit in progress, but the ultimate goal is to allow the follow
 Applications
 ============
 
-1) Testing: I hope to use these generated objects to easily exhaustively test other combinatoric algorithms.
+1. Testing: I hope to use these generated objects to easily exhaustively test other combinatoric algorithms.
 For instance, enumerating all permutations of 10 elements isn't ridiculous, and may help test sorting routines.
-2) Education: I think these algorithms are really neat. I think Knuth is on my side.
+2. Education: I think these algorithms are really neat. I think Knuth is on my side.
 They're not very well-covered in traditional algorithms textbooks.
 Maybe as I fill out the algorithm list I will be able to start having a cohesive exposition of my own.
 
@@ -31,3 +31,11 @@ Todo
 ====
 I'm trying to use the "issues" feature on Github to track this.
 Refer to that, please.
+
+
+References
+==========
+1. Loopless Algorithms for Generating Permutations, Combinations, and Other Combinatorial Configurations (Need to find this paper...)
+2. Ruskey's Book, very comprehensive
+3. Knuth 4a, very in-depth
+4. http://www-ikn.ist.hokudai.ac.jp/~wasa/enumeration_complexity.html

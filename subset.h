@@ -1,7 +1,6 @@
-
-// at the end of the do-while loop, this leaves the range in the state
-// [false,...,false,end)
-// I'm not sure if this is from knuth.
+// This is simply something that essentially increments
+// a binary number represented as a sequence of bools.
+// Very straightforward/naive.
 template<typename iter>
 bool next_subset(iter begin, iter end) {
     if (begin == end) { return false; }
